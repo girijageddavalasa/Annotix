@@ -39,12 +39,14 @@ class Worker:
         self.job_path = self.root / 'metadata' / 'training' / f'{job_id}.json'
         self.cancel_path = self.root / 'metadata' / 'training' / f'{job_id}.cancel'
         self.events_path = self.root / 'logs' / f'training-{job_id}.jsonl'
+        self.event_sequence = 0
         self.job = TrainingJob.model_validate_json(self.job_path.read_text(encoding='utf-8'))
         self.model_root = self.root / 'models' / self.job.model_id
         self.workspace = self.root / 'generated' / 'training' / job_id
 
     def event(self, level: str, message: str, event_type: str = 'log', data: dict | None = None) -> None:
-        payload = {'type': event_type, 'timestamp': datetime.now().strftime('%H:%M:%S'), 'level': level, 'message': message}
+        self.event_sequence += 1
+        payload = {'id': f'{self.job.id}:{self.event_sequence}', 'type': event_type, 'timestamp': datetime.now().strftime('%H:%M:%S'), 'level': level, 'message': message}
         if data is not None:
             payload['data'] = data
         self.events_path.parent.mkdir(parents=True, exist_ok=True)

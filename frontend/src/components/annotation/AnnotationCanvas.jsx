@@ -21,7 +21,7 @@ function resizeBox(original, corner, point, image) {
   return box
 }
 
-export const AnnotationCanvas = memo(function AnnotationCanvas({ image, classes, annotations, predictions = [], selectedClassId, selectedAnnotationId, selectedPredictionId, onSelectAnnotation, onSelectPrediction, onPreview, onChange, onPredictionPreview, onPredictionChange, readOnly = false }) {
+export const AnnotationCanvas = memo(function AnnotationCanvas({ image, classes, annotations, predictions = [], selectedClassId, selectedAnnotationId, selectedPredictionId, onSelectAnnotation, onSelectPrediction, onPreview, onChange, onPredictionPreview, onPredictionChange, readOnly = false, annotationReadOnly = readOnly, predictionReadOnly = readOnly }) {
   const imageRef = useRef(null)
   const overlayRef = useRef(null)
   const interactionRef = useRef(null)
@@ -48,7 +48,7 @@ export const AnnotationCanvas = memo(function AnnotationCanvas({ image, classes,
   const capturePointer = (event) => overlayRef.current?.setPointerCapture(event.pointerId)
 
   const handlePointerDown = (event) => {
-    if (readOnly || event.button !== 0 || selectedClassId == null) return
+    if (annotationReadOnly || event.button !== 0 || selectedClassId == null) return
     const point = toImagePoint(event)
     if (!point) return
     capturePointer(event)
@@ -59,7 +59,7 @@ export const AnnotationCanvas = memo(function AnnotationCanvas({ image, classes,
 
   const beginInteraction = (event, annotation, type, corner = null) => {
     event.stopPropagation()
-    if (readOnly || event.button !== 0) return
+    if (annotationReadOnly || event.button !== 0) return
     const point = toImagePoint(event)
     if (!point) return
     capturePointer(event)
@@ -70,7 +70,7 @@ export const AnnotationCanvas = memo(function AnnotationCanvas({ image, classes,
 
   const beginPredictionInteraction = (event, prediction, type, corner = null) => {
     event.stopPropagation()
-    if (readOnly || event.button !== 0) return
+    if (predictionReadOnly || event.button !== 0) return
     const point = toImagePoint(event)
     if (!point) return
     capturePointer(event)
@@ -145,7 +145,7 @@ export const AnnotationCanvas = memo(function AnnotationCanvas({ image, classes,
         const record = classById.get(prediction.class_id)
         const selected = prediction.id === selectedPredictionId
         const handles = [{ key: 'lt', x: prediction.x1, y: prediction.y1 }, { key: 'rt', x: prediction.x2, y: prediction.y1 }, { key: 'lb', x: prediction.x1, y: prediction.y2 }, { key: 'rb', x: prediction.x2, y: prediction.y2 }]
-        return <g className="prediction-box" key={prediction.id} onPointerDown={(event) => beginPredictionInteraction(event, prediction, 'move')}><rect x={prediction.x1} y={prediction.y1} width={prediction.x2-prediction.x1} height={prediction.y2-prediction.y1} fill={`${record?.color || '#62A6FF'}10`} stroke={record?.color || '#62A6FF'} strokeWidth={selected?3:2} strokeDasharray="9 6" vectorEffect="non-scaling-stroke"/><text x={prediction.x1} y={Math.max(13,prediction.y1)} fill="#fff" fontSize={Math.max(12,image.width/110)} paintOrder="stroke" stroke="#07101b" strokeWidth="3">{record?.name || `Class ${prediction.class_id}`} · {Math.round(prediction.confidence*100)}%</text>{selected&&handles.map(handle=><circle className="resize-handle prediction-handle" key={handle.key} cx={handle.x} cy={handle.y} r={handleRadius} vectorEffect="non-scaling-stroke" onPointerDown={(event)=>beginPredictionInteraction(event,prediction,'resize',handle.key)}/>)}</g>
+        return <g className="prediction-box" key={prediction.id} onPointerDown={(event) => beginPredictionInteraction(event, prediction, 'move')}><rect x={prediction.x1} y={prediction.y1} width={prediction.x2-prediction.x1} height={prediction.y2-prediction.y1} fill={`${record?.color || '#62A6FF'}10`} stroke={record?.color || '#62A6FF'} strokeWidth={selected?3:2} strokeDasharray="9 6" vectorEffect="non-scaling-stroke"/><text x={prediction.x1} y={Math.max(13,prediction.y1)} fill="#fff" fontSize={Math.max(12,image.width/110)} paintOrder="stroke" stroke="#07101b" strokeWidth="3">{record?.name || `Class ${prediction.class_id}`} · {(prediction.confidence*100).toFixed(prediction.confidence < .01 ? 2 : 1)}%</text>{selected&&handles.map(handle=><circle className="resize-handle prediction-handle" key={handle.key} cx={handle.x} cy={handle.y} r={handleRadius} vectorEffect="non-scaling-stroke" onPointerDown={(event)=>beginPredictionInteraction(event,prediction,'resize',handle.key)}/>)}</g>
       })}
       {annotations.map((annotation) => {
         const record = classById.get(annotation.class_id)

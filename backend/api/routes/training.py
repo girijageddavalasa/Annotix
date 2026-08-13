@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 
 from fastapi import APIRouter, HTTPException, Request, status
@@ -69,7 +70,8 @@ async def training_events(job_id: str, request: Request) -> StreamingResponse:
                             payload = json.loads(line)
                         except json.JSONDecodeError:
                             continue
-                        yield f"event: {payload.get('type', 'log')}\ndata: {json.dumps(payload)}\n\n"
+                        event_id = payload.get('id') or f"{job_id}:legacy:{hashlib.sha256(line.encode()).hexdigest()[:16]}"
+                        yield f"id: {event_id}\nevent: {payload.get('type', 'log')}\ndata: {json.dumps(payload)}\n\n"
                     offset = events.tell()
             current = get_job(job_id)
             if current.state not in {'PREPARING', 'TRAINING'}:
@@ -82,4 +84,3 @@ async def training_events(job_id: str, request: Request) -> StreamingResponse:
             await asyncio.sleep(.5)
 
     return StreamingResponse(stream(), media_type='text/event-stream', headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
-

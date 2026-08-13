@@ -134,18 +134,22 @@ export function AugmentationPreview({ image, classes, config }) {
 
   useEffect(() => {
     if (!image) return
+    let active = true
     const timer = setTimeout(() => {
       const source = new Image()
       source.crossOrigin = 'anonymous'
       source.onload = () => {
+        if (!active) return
         renderPreview(originalRef.current, source, annotations, classes, config, false)
         renderPreview(augmentedRef.current, source, annotations, classes, config, true)
         setError('')
       }
-      source.onerror = () => setError('The sample image could not be loaded')
+      source.onerror = () => {
+        if (active) setError(`Could not load ${image.filename} from ${datasetImageUrl(image.id)}`)
+      }
       source.src = datasetImageUrl(image.id)
     }, PREVIEW_DEBOUNCE)
-    return () => clearTimeout(timer)
+    return () => { active = false; clearTimeout(timer) }
   }, [annotations, classes, config, image])
 
   if (!image) return <div className="training-preview-empty">Select a dataset image to preview augmentation.</div>

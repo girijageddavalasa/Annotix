@@ -6,6 +6,8 @@ import { Dataset } from './pages/Dataset'
 import { Classes } from './pages/Classes'
 import { Annotation } from './pages/Annotation'
 import { Training } from './pages/Training'
+import { Review } from './pages/Review'
+import { Export } from './pages/Export'
 import { useDataset } from './hooks/useDataset'
 import { useClasses } from './hooks/useClasses'
 import { useProjects } from './hooks/useProjects'
@@ -74,6 +76,10 @@ export default function App() {
         <Annotation ref={annotationRef} dataset={dataset} classState={classes} onNavigate={setCurrentPage} onSaved={refreshProjectState} locked={training.current_project_locked} projectId={projects.currentProjectId} />
       ) : currentPage === 'Training' ? (
         <Training dataset={dataset} classes={classes.classes} projectName={projects.currentProject?.name} training={training} />
+      ) : currentPage === 'Review' ? (
+        <Review projectId={projects.currentProjectId} classes={classes.classes} onAnnotationsChanged={refreshProjectState} />
+      ) : currentPage === 'Export' ? (
+        <Export key={projects.currentProjectId} projectId={projects.currentProjectId} />
       ) : (
         <Dashboard stats={dataset.stats} onOpenDataset={() => setCurrentPage('Dataset')} />
       )}

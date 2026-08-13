@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 async function request(path, options) {
   const response = await fetch(`${API_BASE_URL}${path}`, options)
@@ -102,3 +102,14 @@ export function editPrediction(predictionId, data) { return request(`/prediction
 export function acceptPrediction(predictionId) { return request(`/predictions/items/${predictionId}/accept`, { method: 'POST' }) }
 export function rejectPrediction(predictionId) { return request(`/predictions/items/${predictionId}/reject`, { method: 'POST' }) }
 export function acceptPredictions(predictionIds) { return request('/predictions/accept-all', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prediction_ids: predictionIds }) }) }
+export function fetchReviewQueue() { return request('/review/queue') }
+export function fetchReviewItem(imageId, modelId, runId) { return request(`/review/items/${encodeURIComponent(imageId)}/${encodeURIComponent(modelId)}/${encodeURIComponent(runId)}`) }
+export function acceptReviewPredictions(predictionIds) { return request('/review/accept-all', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prediction_ids: predictionIds }) }) }
+export function rejectReviewPredictions(predictionIds) { return request('/review/reject-all', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prediction_ids: predictionIds }) }) }
+export function fetchActiveLearningSources() { return request('/active-learning/sources') }
+export function createActiveLearningRanking(data) { return request('/active-learning/rank', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) }
+export function fetchActiveLearningRanking(rankingId) { return request(`/active-learning/rankings/${encodeURIComponent(rankingId)}`) }
+export function openActiveLearningReview(rankingId, imageId) { return request(`/active-learning/rankings/${encodeURIComponent(rankingId)}/review`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_id: imageId }) }) }
+export function fetchExportPreview() { return request('/exports/preview') }
+export function createExport() { return request('/exports', { method: 'POST' }) }
+export function exportDownloadUrl(exportId) { return `${API_BASE_URL}/exports/${encodeURIComponent(exportId)}/download` }

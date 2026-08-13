@@ -14,8 +14,8 @@ const navigation = [
   { label: 'Annotation', icon: Boxes, enabled: true },
   { label: 'Classes', icon: Archive, enabled: true },
   { label: 'Training', icon: GraduationCap, enabled: true },
-  { label: 'Review', icon: ClipboardCheck },
-  { label: 'Export', icon: Download },
+  { label: 'Review', icon: ClipboardCheck, enabled: true },
+  { label: 'Export', icon: Download, enabled: true },
 ]
 
 export function Sidebar({ currentPage, onNavigate, stats }) {

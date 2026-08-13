@@ -171,20 +171,26 @@ def _find_prediction(prediction_id: str) -> tuple[Path, dict, int, PredictionRec
 def update_prediction(prediction_id: str, data: PredictionUpdate) -> PredictionRecord:
     path, payload, index, record = _find_prediction(prediction_id)
     if record.status != 'pending': raise PredictionConflictError('Reviewed predictions cannot be edited')
-    values = record.model_dump(); values.update(data.model_dump(exclude_none=True)); updated = PredictionRecord.model_validate(values)
+    changes = data.model_dump(exclude_none=True)
+    values = record.model_dump(); values.update(changes); updated = PredictionRecord.model_validate(values)
     image_result = get_image_file(updated.image_id)
     if not image_result: raise PredictionNotFoundError('Prediction image not found')
     image = image_result[1]
     if updated.x2 <= updated.x1 or updated.y2 <= updated.y1 or updated.x2 > image.width or updated.y2 > image.height: raise PredictionError('Prediction box is outside the original image')
     if updated.class_id not in {item.id for item in list_classes()}: raise ModelCompatibilityError('Prediction class does not exist')
-    updated = updated.model_copy(update={'corrected': updated.class_id != record.original_class_id or [updated.x1,updated.y1,updated.x2,updated.y2] != record.original_box})
+    changed = updated.class_id != record.class_id or [updated.x1,updated.y1,updated.x2,updated.y2] != [record.x1,record.y1,record.x2,record.y2]
+    history = list(record.edit_history)
+    if changed:
+        history.append({'edited_at': datetime.now(UTC).isoformat(), 'reviewed_by': 'local-user', 'before': {'class_id': record.class_id, 'box': [record.x1,record.y1,record.x2,record.y2]}, 'after': {'class_id': updated.class_id, 'box': [updated.x1,updated.y1,updated.x2,updated.y2]}})
+    updated = updated.model_copy(update={'corrected': updated.class_id != record.original_class_id or [updated.x1,updated.y1,updated.x2,updated.y2] != record.original_box, 'edit_history': history})
     payload['predictions'][index] = updated.model_dump(mode='json'); _atomic_json(path, payload); return updated
 
 
 def reject_prediction(prediction_id: str) -> PredictionRecord:
     path, payload, index, record = _find_prediction(prediction_id)
+    if record.status == 'rejected': return record
     if record.status != 'pending': raise PredictionConflictError('Prediction has already been reviewed')
-    updated = record.model_copy(update={'status':'rejected','reviewed_at':datetime.now(UTC)})
+    updated = record.model_copy(update={'status':'rejected','reviewed_at':datetime.now(UTC),'reviewed_by':'local-user'})
     payload['predictions'][index] = updated.model_dump(mode='json'); _atomic_json(path,payload); return updated
 
 
@@ -192,6 +198,9 @@ def accept_predictions(prediction_ids: list[str]) -> list[PredictionRecord]:
     if not prediction_ids: return []
     found = [_find_prediction(item) for item in dict.fromkeys(prediction_ids)]
     records = [item[3] for item in found]
+    already_accepted = [record for record in records if record.status in {'accepted','edited'}]
+    records = [record for record in records if record.status == 'pending']
+    if not records: return already_accepted
     if any(record.status != 'pending' for record in records): raise PredictionConflictError('One or more predictions have already been reviewed')
     if len({record.image_id for record in records}) != 1: raise PredictionError('Predictions must belong to one image')
     image_id = records[0].image_id
@@ -202,6 +211,10 @@ def accept_predictions(prediction_ids: list[str]) -> list[PredictionRecord]:
     updated_records = []
     for record, annotation in zip(records,new_records):
         path, payload, index, _ = _find_prediction(record.id)
-        updated = record.model_copy(update={'status':'accepted','reviewed_at':datetime.now(UTC),'annotation_id':annotation.id})
+        updated = record.model_copy(update={'status':'edited' if record.corrected else 'accepted','reviewed_at':datetime.now(UTC),'reviewed_by':'local-user','annotation_id':annotation.id})
         payload['predictions'][index] = updated.model_dump(mode='json'); _atomic_json(path,payload); updated_records.append(updated)
-    return updated_records
+    return already_accepted + updated_records
+
+
+def reject_predictions(prediction_ids: list[str]) -> list[PredictionRecord]:
+    return [reject_prediction(prediction_id) for prediction_id in dict.fromkeys(prediction_ids)]

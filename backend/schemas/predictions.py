@@ -39,10 +39,12 @@ class PredictionRecord(BaseModel):
     y2: float
     original_class_id: int
     original_box: list[float]
-    status: Literal['pending', 'accepted', 'rejected'] = 'pending'
+    status: Literal['pending', 'accepted', 'edited', 'rejected'] = 'pending'
     corrected: bool = False
+    edit_history: list[dict] = Field(default_factory=list)
     created_at: datetime
     reviewed_at: datetime | None = None
+    reviewed_by: str | None = None
     annotation_id: str | None = None
 
 

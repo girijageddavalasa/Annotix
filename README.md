@@ -64,6 +64,8 @@ Job state is stored under `metadata/training/`, and structured console events ar
 
 Every run receives a history record under `metadata/training_history/<training_run_id>.json`. Completed model directories contain `training_run.json` with real final losses and evaluation metrics, the snapshot reference, split IDs, status, checkpoint path, and validation smoke-test results. A run is marked complete only after `best.pt` exists and can be loaded by Ultralytics.
 
+The Training augmentation preview loads the selected original image through the canonical dataset image API and draws stored annotations on both the original and transformed canvases. Preview transformations never modify source files. Training console events carry stable per-job event IDs; reconnecting or refreshing replays persisted history without duplicating logical events in the UI.
+
 ## Training API
 
 - `GET /api/training/status`
@@ -81,6 +83,20 @@ The Annotation page can run any completed model version on the current image or 
 Predictions are stored as project-scoped proposals under `data/projects/<project_id>/predictions/`. They remain separate from human annotations until explicitly accepted. Proposals can be moved, resized, assigned to another compatible class, accepted, or rejected. Accepting a proposal appends a normal annotation with original-image pixel coordinates; it never replaces existing annotations or modifies source images.
 
 The model's saved stable class mapping must match the current project's classes before inference can start. Repeated prediction runs have unique run IDs so their origin remains traceable.
+
+## Prediction review
+
+The project-scoped Review workspace reads existing stored prediction records and groups them by image, model version, and prediction run. It never runs inference or combines different model outputs into one review item. Pending proposals appear as dashed boxes alongside solid human annotations and require an explicit Accept, Edit-and-Accept, or Reject action.
+
+Accepted proposals are appended through the existing annotation API using stable image/class IDs and original-image coordinates. Edited proposals retain their original class and box plus timestamped before/after edit history. Rejected and accepted prediction records remain stored for traceability, and repeated acceptance is idempotent so an accepted proposal cannot create duplicate annotations.
+
+Review provides project-level counters, confidence and model filters, queue sorting, previous/next navigation, bulk accept/reject, and computed `PENDING`, `IN_REVIEW`, and `REVIEWED` image states. No prediction is accepted automatically.
+
+### Active learning v1
+
+Review also provides a separate Active Learning mode for deterministic confidence-uncertainty ranking. For each pending prediction with confidence `p`, uncertainty is `1 - p`; image uncertainty is the mean prediction uncertainty. Rankings retain highest uncertainty, lowest/average confidence, prediction count, model ID, prediction-run ID, strategy version, configuration, and stable review key.
+
+Ranking records are stored under `metadata/active_learning/<ranking_id>.json`. Identical project/model/run/strategy/configuration inputs resolve to the same ranking ID and stored result. Images with no detections are listed separately as `NO_PREDICTIONS` and receive no arbitrary uncertainty score. Active Learning never changes annotations or predictions; selecting a ranked item opens the existing Review workflow.
 
 ### Prediction API
 
