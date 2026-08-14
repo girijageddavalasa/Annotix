@@ -26,16 +26,16 @@ Everything runs on your own computer. Images, annotations, prediction proposals,
 
 ```mermaid
 flowchart LR
-    P[Create or open project] --> D[Import image dataset]
-    D --> C[Define classes]
-    C --> A[Create human annotations]
-    A --> T[Train local YOLO model]
-    T --> I[Run model prediction]
-    I --> R[Review proposals]
+    P["Create or open project"] --> D["Import image dataset"]
+    D --> C["Define classes"]
+    C --> A["Create human annotations"]
+    A --> T["Train local YOLO model"]
+    T --> I["Run model prediction"]
+    I --> R["Review proposals"]
     R -->|Accept or edit| A
-    R -->|Pending proposals| AL[Active Learning ranking]
+    R -->|Pending proposals| AL["Active Learning ranking"]
     AL --> R
-    A --> E[Export YOLO dataset ZIP]
+    A --> E["Export YOLO dataset ZIP"]
 ```
 
 The backend remains the source of truth throughout this flow. The frontend displays and edits state through the API; it does not maintain a separate dataset database.
@@ -44,24 +44,24 @@ The backend remains the source of truth throughout this flow. The frontend displ
 
 ```mermaid
 flowchart TB
-    subgraph Browser[React + Vite frontend]
-        UI[Pages and components]
-        Hooks[API and state hooks]
+    subgraph browser_app["React and Vite frontend"]
+        UI["Pages and components"]
+        Hooks["API and state hooks"]
     end
 
-    subgraph LocalBackend[FastAPI backend]
-        API[API routes]
-        Services[Project-scoped services]
-        Workers[Training and prediction workers]
+    subgraph local_backend["FastAPI backend"]
+        API["API routes"]
+        Services["Project-scoped services"]
+        Workers["Training and prediction workers"]
     end
 
-    subgraph LocalDisk[Local project storage]
-        Images[Original images]
-        Metadata[Dataset, classes, and job metadata]
-        Annotations[Human annotations]
-        Predictions[Prediction proposals and history]
-        Artifacts[Snapshots, exports, and augmented copies]
-        Models[Versioned YOLO models]
+    subgraph local_disk["Local project storage"]
+        Images["Original images"]
+        Metadata["Dataset, classes, and job metadata"]
+        Annotations["Human annotations"]
+        Predictions["Prediction proposals and history"]
+        Artifacts["Snapshots, exports, and augmented copies"]
+        Models["Versioned YOLO models"]
     end
 
     UI --> Hooks --> API
@@ -167,10 +167,10 @@ Annotations are stored in original-image pixel coordinates, not browser or resiz
 
 ```mermaid
 flowchart LR
-    B[Browser pointer coordinates] --> V[Displayed image coordinates]
-    V --> O[Original image coordinates]
-    O --> S[Stored annotation]
-    S --> Y[Normalized YOLO label during training or export]
+    B["Browser pointer coordinates"] --> V["Displayed image coordinates"]
+    V --> O["Original image coordinates"]
+    O --> S["Stored annotation"]
+    S --> Y["Normalized YOLO label during training or export"]
 ```
 
 For example, an original `1920 x 1080` image displayed at `960 x 540` has a scale of two. A displayed box from `(100, 100)` to `(400, 300)` is stored approximately as `(200, 200)` to `(800, 600)`.
@@ -241,7 +241,7 @@ sequenceDiagram
     API->>Disk: Create job metadata
     API->>Worker: Start background process
     Worker->>Disk: Create immutable dataset snapshot
-    Worker->>YOLO: train(epochs, image size, batch, device, ...)
+    Worker->>YOLO: Start training with configured parameters
     loop Every real epoch
         YOLO-->>Worker: Real metrics and progress
         Worker-->>Disk: Persist events and job state
