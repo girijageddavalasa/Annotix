@@ -9,7 +9,7 @@ const STATUS_LABELS = {
   CANCELLED: 'CANCELLED',
 }
 
-export function TrainingConsole({ projectName, stats, device, state = 'IDLE', logs = [], metrics, onCancel }) {
+export function TrainingConsole({ projectName, stats, device, configuredEpochs, state = 'IDLE', logs = [], metrics, onCancel }) {
   const timestamp = new Date().toLocaleTimeString('en-GB', { hour12: false })
   const initialLogs = [
     `Annotix training console initialized.`,
@@ -18,6 +18,7 @@ export function TrainingConsole({ projectName, stats, device, state = 'IDLE', lo
     `Found ${stats.classes} classes.`,
     `Model: YOLO`,
     `Device: ${device === 'auto' ? 'Auto' : device.toUpperCase()}`,
+    `Configured epochs: ${configuredEpochs}.`,
     `Waiting to start training...`,
   ]
   const displayedLogs = logs.length ? logs : initialLogs.map((message) => ({ timestamp, level: 'INFO', message }))
@@ -29,6 +30,6 @@ export function TrainingConsole({ projectName, stats, device, state = 'IDLE', lo
         {displayedLogs.map((entry, index) => <div className={`console-line console-line--${(entry.level || 'INFO').toLowerCase()}`} key={entry.id || `${entry.timestamp}-${index}`}><time>[{entry.timestamp || timestamp}]</time><b>{entry.level || 'INFO'}</b><span>{entry.message}</span></div>)}
       </div>
     </div>
-    <aside className="training-metrics"><header><Activity size={16} /><span>TRAINING METRICS</span></header><dl>{[['Epoch', metrics?.epoch ? `${metrics.epoch} / ${metrics.total_epochs}` : '--'], ['Loss', metrics?.loss ?? '--'], ['Box loss', metrics?.box_loss ?? '--'], ['Class loss', metrics?.class_loss ?? '--'], ['mAP50', metrics?.map50 ?? '--'], ['mAP50-95', metrics?.map50_95 ?? '--']].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{typeof value === 'number' ? value.toFixed(4) : value}</dd></div>)}</dl><div className="metrics-progress"><span><b>Progress</b><strong>{Math.round(metrics?.progress || 0)}%</strong></span><div><i style={{ width: `${metrics?.progress || 0}%` }} /></div><small>{metrics?.epoch ? `Epoch ${metrics.epoch} completed` : 'Not started'}</small></div></aside>
+    <aside className="training-metrics"><header><Activity size={16} /><span>TRAINING METRICS</span></header><dl>{[['Epoch', metrics?.epoch ? `${metrics.epoch} / ${metrics.total_epochs}` : `0 / ${configuredEpochs}`], ['Loss', metrics?.loss ?? '--'], ['Box loss', metrics?.box_loss ?? '--'], ['Class loss', metrics?.class_loss ?? '--'], ['mAP50', metrics?.map50 ?? '--'], ['mAP50-95', metrics?.map50_95 ?? '--']].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{typeof value === 'number' ? value.toFixed(4) : value}</dd></div>)}</dl><div className="metrics-progress"><span><b>Progress</b><strong>{Math.round(metrics?.progress || 0)}%</strong></span><div><i style={{ width: `${metrics?.progress || 0}%` }} /></div><small>{metrics?.epoch ? `Epoch ${metrics.epoch} completed` : `Ready for ${configuredEpochs} epochs`}</small></div></aside>
   </section>
 }

@@ -43,7 +43,7 @@ class AugmentationConfiguration(BaseModel):
 
 
 class TrainingStartRequest(BaseModel):
-    epochs: int = Field(ge=1, le=10000)
+    epochs: int = Field(ge=1, le=500)
     image_size: int = Field(ge=32, le=4096)
     batch_size: int = Field(ge=1, le=1024)
     device: Literal['auto', 'cpu', 'gpu'] = 'auto'

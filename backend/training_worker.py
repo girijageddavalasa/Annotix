@@ -74,6 +74,7 @@ class Worker:
             'train_image_ids': [item.id for item in current.train_images],
             'validation_image_ids': [item.id for item in current.validation_images],
             'class_mapping': snapshot.get('class_mapping'),
+            'epochs': current.configuration.epochs,
             'training_configuration': current.configuration.model_dump(mode='json'),
             'augmentation_configuration': current.configuration.augmentation.model_dump(mode='json'),
             'seed': current.configuration.seed, 'final_metrics': current.metrics.model_dump(mode='json'),
@@ -135,6 +136,7 @@ class Worker:
         snapshot = {
             'schema_version': 1, 'training_run_id': self.job.id, 'model_id': self.job.model_id,
             'created_at': self.job.created_at.isoformat(), 'seed': self.job.configuration.seed,
+            'epochs': self.job.configuration.epochs,
             'validation_fraction': self.job.configuration.validation_fraction,
             'train_image_ids': [item[0]['id'] for item in train_items],
             'validation_image_ids': [item[0]['id'] for item in validation_items],
@@ -290,7 +292,7 @@ class Worker:
 
             def on_train_start(trainer):
                 self.update(state='TRAINING')
-                self.event('INFO', 'YOLO training started.')
+                self.event('INFO', f'YOLO training started for {int(trainer.epochs)} epochs.')
 
             def on_batch_end(trainer):
                 if self.cancelled(): trainer.stop = True
