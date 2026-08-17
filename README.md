@@ -21,6 +21,7 @@ Everything runs on your own computer. Images, annotations, prediction proposals,
 | Review | Keep dashed model proposals separate from solid human annotations; edit, accept, reject, bulk-review, filter, sort, and retain prediction history. |
 | Active Learning | Rank eligible pending predictions by confidence uncertainty and open selected items in the existing Review workflow. |
 | Export | Validate and generate an immutable, project-local YOLO dataset ZIP with train/validation images, labels, and `data.yaml`. |
+| Validation | Run comprehensive end-to-end pipeline health checks covering dataset integrity, annotation validity, training status, prediction consistency, review workflow, active learning, export validation, project isolation, and concurrency safety. Reports PASS/WARNING/FAIL status with detailed reasons. |
 
 ## Application workflow
 

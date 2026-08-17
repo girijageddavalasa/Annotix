@@ -239,3 +239,50 @@ button { font: inherit; }
   .training-heading { align-items: flex-start; }.local-training-note { display: none; }.stats-grid--five,.training-form-grid,.preview-grid { grid-template-columns: 1fr; }.output-strategy { flex-direction: column; }.augmentation-count { width: 100%; }
   .augmentation-mode { align-items: flex-start; flex-wrap: wrap; }.augmentation-mode>strong { width: 100%; }.operation-groups,.random-limits { grid-template-columns: 1fr; }
 }
+
+/* Validation */
+.validation { width: min(1120px, 100%); margin: auto; }
+.validation-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 80px 20px; border: 1px dashed #2d3b50; border-radius: 12px; background: #0c121c; }
+.validation-empty h2 { margin: 0; color: #8291a6; font-size: 18px; }
+.validation-empty p { margin: 0; color: #65758c; font-size: 12px; }
+.validation-empty svg { color: #4f6179; }
+.validation-summary { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; background: rgba(17, 23, 34, .86); }
+.validation-summary__overall { display: flex; align-items: center; gap: 12px; }
+.validation-summary__label { color: #71829a; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+.validation-summary__meta { display: flex; gap: 20px; color: #65758c; font-size: 10px; }
+.validation-summary__meta code { padding: 3px 6px; border: 1px solid #2d3b50; border-radius: 4px; color: #8291a6; background: #0c121c; font-family: ui-monospace, monospace; }
+.validation-categories { display: grid; gap: 16px; }
+.validation-category { border: 1px solid var(--border); border-radius: 10px; background: rgba(17, 23, 34, .86); }
+.validation-category__header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.validation-category__header h3 { margin: 0; color: #f3f6fb; font-size: 15px; }
+.validation-category__checks { padding: 16px 20px; }
+.validation-check { padding: 12px 0; border-bottom: 1px solid #1e2838; }
+.validation-check:last-child { border-bottom: none; }
+.validation-check__main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.validation-check__name { color: #c5d4e5; font-size: 12px; font-weight: 600; }
+.validation-check__message { color: #71849b; font-size: 11px; }
+.validation-check__details { margin-top: 8px; }
+.validation-check__details details { cursor: pointer; }
+.validation-check__details summary { color: #5b9fe7; font-size: 10px; }
+.validation-check__details pre { margin: 8px 0 0; padding: 10px; border: 1px solid #2d3b50; border-radius: 6px; color: #8291a6; background: #0c121c; font-size: 9px; overflow-x: auto; }
+.validation-category__warnings { padding: 12px 20px; border-top: 1px solid #29384b; background: #1a1f2b; }
+.validation-category__warnings h4 { margin: 0 0 8px; color: #e3af68; font-size: 11px; }
+.validation-category__warnings ul { margin: 0; padding-left: 18px; }
+.validation-category__warnings li { color: #b8a260; font-size: 10px; line-height: 1.6; }
+.validation-summary-text { margin-top: 24px; padding: 18px 22px; border: 1px solid var(--border); border-radius: 10px; background: rgba(17, 23, 34, .86); }
+.validation-summary-text h3 { margin: 0 0 16px; color: #f3f6fb; font-size: 14px; }
+.validation-summary-text__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.validation-summary-text__item { display: flex; justify-content: space-between; padding: 10px 12px; border: 1px solid #1e2838; border-radius: 6px; background: #0c121c; }
+.validation-summary-text__category { color: #71849b; font-size: 11px; }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
+.status-badge--pass { color: #50d69a; border-color: #285544; background: #10251f; }
+.status-badge--warning { color: #e3af68; border-color: #58472f; background: #271f14; }
+.status-badge--fail { color: #e68c91; border-color: #633a40; background: #28191d; }
+.status-icon { flex-shrink: 0; }
+.status-icon--pass { color: #50d69a; }
+.status-icon--warning { color: #e3af68; }
+.status-icon--fail { color: #e68c91; }
+.spin { animation: spin 1s linear infinite; }
+.alert { display: flex; align-items: center; gap: 10px; padding: 12px 16px; margin-bottom: 20px; border-radius: 8px; font-size: 12px; }
+.alert--error { color: #e68c91; border-color: #633a40; background: #28191d; }
+

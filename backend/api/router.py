@@ -10,6 +10,7 @@ from api.routes.predictions import router as predictions_router
 from api.routes.review import router as review_router
 from api.routes.active_learning import router as active_learning_router
 from api.routes.exports import router as exports_router
+from api.routes.validation import router as validation_router
 
 api_router = APIRouter()
 api_router.include_router(health_router)
@@ -22,3 +23,4 @@ api_router.include_router(predictions_router, prefix="/predictions")
 api_router.include_router(review_router, prefix="/review")
 api_router.include_router(active_learning_router, prefix="/active-learning")
 api_router.include_router(exports_router, prefix="/exports")
+api_router.include_router(validation_router, prefix="/validation")

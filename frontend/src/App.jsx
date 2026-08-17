@@ -8,6 +8,7 @@ import { Annotation } from './pages/Annotation'
 import { Training } from './pages/Training'
 import { Review } from './pages/Review'
 import { Export } from './pages/Export'
+import { Validation } from './pages/Validation'
 import { useDataset } from './hooks/useDataset'
 import { useClasses } from './hooks/useClasses'
 import { useProjects } from './hooks/useProjects'
@@ -80,6 +81,8 @@ export default function App() {
         <Review projectId={projects.currentProjectId} classes={classes.classes} onAnnotationsChanged={refreshProjectState} />
       ) : currentPage === 'Export' ? (
         <Export key={projects.currentProjectId} projectId={projects.currentProjectId} />
+      ) : currentPage === 'Validation' ? (
+        <Validation />
       ) : (
         <Dashboard stats={dataset.stats} onOpenDataset={() => setCurrentPage('Dataset')} />
       )}

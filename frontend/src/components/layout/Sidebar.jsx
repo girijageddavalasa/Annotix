@@ -6,6 +6,7 @@ import {
   Download,
   GraduationCap,
   LayoutDashboard,
+  ShieldCheck,
 } from 'lucide-react'
 
 const navigation = [
@@ -16,6 +17,7 @@ const navigation = [
   { label: 'Training', icon: GraduationCap, enabled: true },
   { label: 'Review', icon: ClipboardCheck, enabled: true },
   { label: 'Export', icon: Download, enabled: true },
+  { label: 'Validation', icon: ShieldCheck, enabled: true },
 ]
 
 export function Sidebar({ currentPage, onNavigate, stats }) {
